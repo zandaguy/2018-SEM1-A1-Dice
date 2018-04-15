@@ -6,6 +6,7 @@ import model.interfaces.GameEngineCallback;
 import model.interfaces.Player;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -15,7 +16,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class GameEngineImpl implements GameEngine{
 
     private Map<String, Player> players = new HashMap<>();
-    private ArrayList<GameEngineCallback> callbacks = new ArrayList<>();
+    private List<GameEngineCallback> callbacks = new ArrayList<>();
 
     @Override
     public boolean placeBet(Player player, int bet) {
@@ -35,12 +36,6 @@ public class GameEngineImpl implements GameEngine{
         }
     }
 
-    /* returns a pseudo random int between 1 (inclusive) and numfaces+1 (exclusive). */
-    private static int randomDiceValue(int numfaces) {
-        return ThreadLocalRandom.current().nextInt(1, numfaces+1);
-    }
-
-    //TODO Implement rollHouse function
     @Override
     public void rollHouse(int initialDelay, int finalDelay, int delayIncrement) {
 
@@ -55,15 +50,20 @@ public class GameEngineImpl implements GameEngine{
 
     }
 
-    /* Pauses thread execution for 'delayIncrement' milliseconds */
+    /* Pauses thread execution for 'delay' milliseconds */
     private static void delayBy(int delay) {
         try {
             Thread.sleep(delay);
         } catch (InterruptedException e){
             // Can ignore this exception
+            Thread.currentThread().interrupt();
         }
     }
 
+    /*
+    Simulates dice rolls and logs each dice face total. Uses player callback methods if a player is entered,
+    uses the house callback methods if null is entered for Player.
+     */
     private DicePair rollDice(Player player, int initialDelay, int finalDelay, int delayIncrement) {
 
         DicePair dice;
@@ -72,8 +72,6 @@ public class GameEngineImpl implements GameEngine{
         // Retrieve a dice pair value at each increment and log it
         for(int delay = initialDelay; delay < finalDelay; delay +=delayIncrement) {
 
-            // Delay by delay ms each time a new number is shown on the dice
-            delayBy(delay);
 
             dice = new DicePairImpl(randomDiceValue(NUM_FACES),
                     randomDiceValue(NUM_FACES), NUM_FACES);
@@ -85,12 +83,21 @@ public class GameEngineImpl implements GameEngine{
                     callback.intermediateHouseResult(dice, this);
                 }
             }
+
+            // Delay by 'delay' ms each time a new number is shown on the dice. I assumed 'initialDelay' was the delay
+            // between the first two DicePair rolls and not the delay before the first roll. Otherwise there would
+            // be no delay before the result values.
+
+            delayBy(delay);
         }
 
         // Roll dice to return final result to update player or resolve bets
         return new DicePairImpl(randomDiceValue(NUM_FACES), randomDiceValue(NUM_FACES), NUM_FACES);
     }
 
+    /*
+    Checks all player dice results against house results and updates player points accordingly.
+     */
     private void resolveBets(DicePair houseDice) {
         int houseResult = houseDice.getDice1() + houseDice.getDice2();
 
@@ -107,7 +114,16 @@ public class GameEngineImpl implements GameEngine{
             } else {
                 //A draw, player points remain unchanged
             }
+            // Clear all bets
+            player.placeBet(0);
         }
+    }
+
+    /*
+    Returns a pseudo random int between 1 (inclusive) and numfaces+1 (exclusive).
+    */
+    private static int randomDiceValue(int numfaces) {
+        return ThreadLocalRandom.current().nextInt(1, numfaces+1);
     }
 
     @Override
@@ -125,13 +141,11 @@ public class GameEngineImpl implements GameEngine{
         return players.remove(player.getPlayerId(), player);
     }
 
-    //TODO Implement addGameEngineCallback, create necessary date structures.
     @Override
     public void addGameEngineCallback(GameEngineCallback gameEngineCallback) {
         callbacks.add(gameEngineCallback);
     }
 
-    //TODO Implement removeGameEngineCallback
     @Override
     public boolean removeGameEngineCallback(GameEngineCallback gameEngineCallback) {
         return callbacks.remove(gameEngineCallback);
@@ -140,7 +154,6 @@ public class GameEngineImpl implements GameEngine{
     @Override
     public Collection<Player> getAllPlayers() {
         // values() returns a collection view of the values contained in this map
-
         return Collections.unmodifiableCollection(players.values());
     }
 

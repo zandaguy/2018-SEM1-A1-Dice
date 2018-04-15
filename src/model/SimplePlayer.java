@@ -8,13 +8,14 @@ public class SimplePlayer implements Player{
     private String playerName;
     private String playerId;
     private int points;
-    private int bet = 0;
-    private DicePair dicePair = null;
+    private int bet;
+    private DicePair dicePair;
 
     public SimplePlayer(String playerId, String playerName, int points) {
         this.playerId = playerId;
         this.playerName = playerName;
         this.points = points;
+        bet = 0;
     }
 
     @Override
@@ -42,11 +43,7 @@ public class SimplePlayer implements Player{
         return playerId;
     }
 
-    //TODO Implement placeBet
-
-    // Place a bet only if the player has enough points to do so.
-    // Else return false.
-
+    /* Place a bet only if the player has enough points to do so. Otherwise return false. */
     @Override
     public boolean placeBet(int bet) {
         if(bet <= points) {
@@ -58,15 +55,16 @@ public class SimplePlayer implements Player{
         }
     }
 
-    //TODO Return bet created by placeBet
     @Override
     public int getBet() {
         return bet;
     }
 
-    //TODO Throw exception if dice pair is null
     @Override
     public DicePair getRollResult() {
+        if(dicePair == null) {
+            throw (new NullPointerException("Player dicePair returns null. Must be set before being accessed."));
+        }
         return dicePair;
     }
 

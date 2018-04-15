@@ -12,7 +12,6 @@ public class DicePairImpl implements DicePair{
     private int dice2;
 
     public DicePairImpl(int dice1, int dice2, int numFaces) {
-        // TODO add try catch to prevent dice values outside of numFaces range
         this.dice1 = dice1;
         this.dice2 = dice2;
         this.numFaces = numFaces;

@@ -32,12 +32,12 @@ public class MyTestClient1
 
 		for (Player player : gameEngine.getAllPlayers()) {
 			gameEngine.placeBet(player, 100);
-			gameEngine.rollPlayer(player, 1, 100, 20);
+			gameEngine.rollPlayer(player, 1, 3000, 1000);
 		}
 
 		// all players have rolled so now house rolls (GameEngineCallBack is
 		// called) and results are calculated
-		gameEngine.rollHouse(1, 100, 20);
+		gameEngine.rollHouse(1, 3000, 1000);
 
 		gameEngine.removePlayer(players[2]);
 
