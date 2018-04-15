@@ -17,29 +17,15 @@ public class GameEngineImpl implements GameEngine{
     private Map<String, Player> players = new HashMap<>();
     private ArrayList<GameEngineCallback> callbacks = new ArrayList<>();
 
-    //TODO Finish placebet in SimplePlayer
     @Override
     public boolean placeBet(Player player, int bet) {
         return player.placeBet(bet);
     }
 
-    //TODO Add delay too rollPlayer
     @Override
     public void rollPlayer(Player player, int initialDelay, int finalDelay, int delayIncrement) {
-        // Start at initialDelay and increment by delayIncrement until finalDelay
-        // Retrieve a dice pair value at each increment
-        // TODO Create helper function for this loop
-        for(int i = initialDelay; i <= finalDelay; i+=delayIncrement) {
-            DicePair dice = new DicePairImpl(randomDiceValue(NUM_FACES),
-                    randomDiceValue(NUM_FACES), NUM_FACES);
-            for(GameEngineCallback callback: callbacks) {
-                callback.intermediateResult(player, dice, this);
-            }
-        }
 
-        // Roll dice to generate dice pair value
-        DicePair dice = new DicePairImpl(randomDiceValue(NUM_FACES),
-                randomDiceValue(NUM_FACES), NUM_FACES);
+        DicePair dice = rollDice(player, initialDelay, finalDelay, delayIncrement);
 
         // Update player with dice results for retrieval later
         player.setRollResult(dice);
@@ -49,7 +35,7 @@ public class GameEngineImpl implements GameEngine{
         }
     }
 
-    // returns a pseudo random int between 1 (inclusive) and numfaces+1 (exclusive).
+    /* returns a pseudo random int between 1 (inclusive) and numfaces+1 (exclusive). */
     private static int randomDiceValue(int numfaces) {
         return ThreadLocalRandom.current().nextInt(1, numfaces+1);
     }
@@ -58,22 +44,51 @@ public class GameEngineImpl implements GameEngine{
     @Override
     public void rollHouse(int initialDelay, int finalDelay, int delayIncrement) {
 
-        for(int i = initialDelay; i <= finalDelay; i+=delayIncrement) {
-            DicePair dice = new DicePairImpl(randomDiceValue(NUM_FACES),
-                    randomDiceValue(NUM_FACES), NUM_FACES);
-            for(GameEngineCallback callback: callbacks) {
-                callback.intermediateHouseResult(dice, this);
-            }
-        }
+        DicePair dice = rollDice(null, initialDelay, finalDelay, delayIncrement);
 
-        DicePair dice = new DicePairImpl(randomDiceValue(NUM_FACES),
-                randomDiceValue(NUM_FACES), NUM_FACES);
-
+        // Adjust points according to outcomes of rollDice()
         resolveBets(dice);
+
         for (GameEngineCallback callback: callbacks) {
             callback.houseResult(dice, this);
         }
 
+    }
+
+    /* Pauses thread execution for 'delayIncrement' milliseconds */
+    private static void delayBy(int delay) {
+        try {
+            Thread.sleep(delay);
+        } catch (InterruptedException e){
+            // Can ignore this exception
+        }
+    }
+
+    private DicePair rollDice(Player player, int initialDelay, int finalDelay, int delayIncrement) {
+
+        DicePair dice;
+
+        // Start at initialDelay and increment the delay by delayIncrement until it is >= to finalDelay
+        // Retrieve a dice pair value at each increment and log it
+        for(int delay = initialDelay; delay < finalDelay; delay +=delayIncrement) {
+
+            // Delay by delay ms each time a new number is shown on the dice
+            delayBy(delay);
+
+            dice = new DicePairImpl(randomDiceValue(NUM_FACES),
+                    randomDiceValue(NUM_FACES), NUM_FACES);
+
+            for(GameEngineCallback callback: callbacks) {
+                if(player != null) {
+                    callback.intermediateResult(player, dice, this);
+                } else {
+                    callback.intermediateHouseResult(dice, this);
+                }
+            }
+        }
+
+        // Roll dice to return final result to update player or resolve bets
+        return new DicePairImpl(randomDiceValue(NUM_FACES), randomDiceValue(NUM_FACES), NUM_FACES);
     }
 
     private void resolveBets(DicePair houseDice) {

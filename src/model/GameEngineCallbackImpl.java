@@ -27,7 +27,7 @@ public class GameEngineCallbackImpl implements GameEngineCallback
 		Logger.getGlobal().getParent().getHandlers()[0].setLevel(Level.FINE);
 
 		// FINE shows rolling output, INFO only shows result
-		logger.setLevel(Level.INFO);
+		logger.setLevel(Level.FINE);
 	}
 
 	@Override
