@@ -2,7 +2,6 @@ package model;
 
 import model.interfaces.DicePair;
 import model.interfaces.GameEngine;
-
 import java.util.concurrent.ThreadLocalRandom;
 
 public class DicePairImpl implements DicePair{

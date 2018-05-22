@@ -9,21 +9,12 @@ import model.interfaces.GameEngine;
 import model.interfaces.GameEngineCallback;
 import model.interfaces.Player;
 
-/**
- * 
- * Skeleton example implementation of GameEngineCallback showing Java logging behaviour
- * 
- * @author Caspar Ryan
- * @see model.interfaces.GameEngineCallback
- * 
- */
 public class GameEngineCallbackImpl implements GameEngineCallback
 {
 	private Logger logger = Logger.getLogger("assignment1");
 
 	public GameEngineCallbackImpl()
 	{
-	    // TODO Check if this is correct
 		Logger.getGlobal().getParent().getHandlers()[0].setLevel(Level.FINE);
 
 		// FINE shows rolling output, INFO only shows result
@@ -35,7 +26,6 @@ public class GameEngineCallbackImpl implements GameEngineCallback
 	{
 		// intermediate results logged at Level.FINE
 		displayRoll("ROLLING", Level.FINE, player.getPlayerName(), dicePair.toString());
-		// TO DO: complete this method to log results
 	}
 
 	@Override
