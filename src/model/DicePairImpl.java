@@ -7,9 +7,9 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class DicePairImpl implements DicePair{
 
-    private int numFaces;
-    private int dice1;
-    private int dice2;
+    private final int numFaces;
+    private final int dice1;
+    private final int dice2;
 
     public DicePairImpl(int dice1, int dice2, int numFaces) {
         this.dice1 = dice1;
