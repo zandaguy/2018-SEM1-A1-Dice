@@ -1,4 +1,4 @@
-package model;
+package view;
 
 import java.util.Collection;
 import java.util.logging.Level;
@@ -9,21 +9,12 @@ import model.interfaces.GameEngine;
 import model.interfaces.GameEngineCallback;
 import model.interfaces.Player;
 
-/**
- * 
- * Skeleton example implementation of GameEngineCallback showing Java logging behaviour
- * 
- * @author Caspar Ryan
- * @see model.interfaces.GameEngineCallback
- * 
- */
 public class GameEngineCallbackImpl implements GameEngineCallback
 {
 	private Logger logger = Logger.getLogger("assignment1");
 
 	public GameEngineCallbackImpl()
 	{
-	    // TODO Check if this is correct
 		Logger.getGlobal().getParent().getHandlers()[0].setLevel(Level.FINE);
 
 		// FINE shows rolling output, INFO only shows result
